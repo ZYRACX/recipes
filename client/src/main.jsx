@@ -12,11 +12,13 @@ import { SearchProvider } from './context/SearchContext.jsx';
 import './index.css';
 import { AuthProvider } from "./context/AuthContext.jsx";
 import Favourites from './page/favourites.jsx';
+import { FavouritesProvider } from './context/FavouritesContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
     <AuthProvider>
+      <FavouritesProvider>
       <SearchProvider>
         <Header isLoggedIn={!!localStorage.getItem('token')} />
         <Routes>
@@ -28,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/favourites" element={<Favourites />}/>
         </Routes>
       </SearchProvider>
+      </FavouritesProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

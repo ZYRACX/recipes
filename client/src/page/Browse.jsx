@@ -1,21 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import MenuItem from '../components/MenuItem.jsx';
-import { SlidersHorizontal, Leaf, Globe, X } from 'lucide-react';
+// src/pages/Browse.jsx
+import React, { useState, useEffect, useMemo } from "react";
+import MenuItem from "../components/MenuItem.jsx";
+import SearchBar from "../components/SearchBar.jsx";
 import { useSearch } from "../context/SearchContext.jsx";
-import SearchBar from '../components/SearchBar.jsx';
-import { addFavourite, removeFavourite, getUserFavourites } from "../services/favouritesService.js";
+import { useFavourites } from "../context/FavouritesContext.jsx";
+import { SlidersHorizontal, Leaf, Globe, X } from "lucide-react";
 
 export const Browse = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const { searchTerm } = useSearch();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCountries, setSelectedCountries] = useState([]);
   const [selectedDiets, setSelectedDiets] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [favourites, setFavourites] = useState([]); // Favourite recipe IDs
 
-  const token = localStorage.getItem("token");
+  const { favourites, toggleFavourite, isFavourite } = useFavourites();
 
   // Fetch recipes
   useEffect(() => {
@@ -33,72 +32,33 @@ export const Browse = () => {
     fetchRecipes();
   }, []);
 
-  // Fetch user favourites
-  useEffect(() => {
-    if (!token) return;
-    const fetchFavourites = async () => {
-      try {
-        const favs = await getUserFavourites(token);
-        setFavourites(favs.map(fav => fav.recipeId));
-      } catch (err) {
-        console.error("Failed to fetch favourites:", err);
-      }
-    };
-    fetchFavourites();
-  }, [token]);
+  const availableCountries = useMemo(() => [...new Set(recipes.map(r => r.country))].sort(), [recipes]);
 
-  const availableCountries = useMemo(() => {
-    const countries = new Set(recipes.map(item => item.country));
-    return Array.from(countries).sort();
-  }, [recipes]);
-
-  const filteredMenuItems = useMemo(() => {
-    return recipes.filter(item => {
-      const nameMatch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const countryMatch =
-        selectedCountries.length === 0 || selectedCountries.includes(item.country);
-      const dietMatch =
-        selectedDiets.length === 0 ||
-        (selectedDiets.includes("Vegetarian") && item.type === "veg") ||
-        (selectedDiets.includes("Non-Vegetarian") && item.type === "nonveg");
-      return nameMatch && countryMatch && dietMatch;
-    });
-  }, [searchTerm, selectedCountries, selectedDiets, recipes]);
+  const filteredMenuItems = useMemo(
+    () =>
+      recipes.filter(item => {
+        const nameMatch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const countryMatch = selectedCountries.length === 0 || selectedCountries.includes(item.country);
+        const dietMatch =
+          selectedDiets.length === 0 ||
+          (selectedDiets.includes("Vegetarian") && item.type === "veg") ||
+          (selectedDiets.includes("Non-Vegetarian") && item.type === "nonveg");
+        return nameMatch && countryMatch && dietMatch;
+      }),
+    [recipes, searchTerm, selectedCountries, selectedDiets]
+  );
 
   const toggleCountry = (country) => {
-    setSelectedCountries(prev =>
-      prev.includes(country) ? prev.filter(c => c !== country) : [...prev, country]
-    );
+    setSelectedCountries(prev => (prev.includes(country) ? prev.filter(c => c !== country) : [...prev, country]));
   };
 
   const toggleDiet = (diet) => {
-    setSelectedDiets(prev =>
-      prev.includes(diet) ? prev.filter(d => d !== diet) : [...prev, diet]
-    );
+    setSelectedDiets(prev => (prev.includes(diet) ? prev.filter(d => d !== diet) : [...prev, diet]));
   };
 
   const clearFilters = () => {
     setSelectedCountries([]);
     setSelectedDiets([]);
-  };
-
-  const handleFavourite = async (item) => {
-    if (!token) {
-      alert("Please log in to add favourites.");
-      return;
-    }
-    try {
-      if (favourites.includes(item.id)) {
-        await removeFavourite(item.id, token);
-        setFavourites(prev => prev.filter(id => id !== item.id));
-      } else {
-        await addFavourite(item.id, token);
-        setFavourites(prev => [...prev, item.id]);
-      }
-    } catch (err) {
-      console.error("Failed to toggle favourite:", err);
-      alert("Failed to update favourite.");
-    }
   };
 
   return (
@@ -109,9 +69,7 @@ export const Browse = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-4xl font-extrabold text-gray-900">
-            Today's Delicious Menu
-          </h2>
+          <h2 className="text-4xl font-extrabold text-gray-900">Today's Delicious Menu</h2>
           <button
             onClick={() => setIsFilterOpen(true)}
             className="flex items-center space-x-2 py-2 px-4 bg-white rounded-lg shadow-md text-gray-700 font-medium hover:bg-gray-100 border border-gray-200"
@@ -133,18 +91,13 @@ export const Browse = () => {
                 <MenuItem
                   key={item.id}
                   item={item}
-                  onfavourite={handleFavourite}
-                  isFavourited={favourites.includes(item.id)}
+                  onfavourite={() => toggleFavourite(item.id)}
+                  isFavourited={isFavourite(item.id)}
                 />
               ))
             ) : (
               <div className="col-span-full text-center py-10 bg-white rounded-xl shadow-md">
-                <p className="text-xl font-medium text-gray-600">
-                  No items found matching your filters.
-                </p>
-                <p className="text-sm text-gray-400">
-                  Try adjusting your filters or search.
-                </p>
+                <p className="text-xl font-medium text-gray-600">No items found matching your filters.</p>
               </div>
             )}
           </div>
@@ -234,3 +187,5 @@ export const Browse = () => {
     </div>
   );
 };
+
+export default Browse;
