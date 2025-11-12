@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Login = () => {
+   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
    const { setIsLoggedIn } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -17,7 +18,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${backendUrl}/api/auth/login`, {
         email: formData.email,
         password: formData.password,
       });

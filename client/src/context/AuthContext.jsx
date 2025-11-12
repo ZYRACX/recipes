@@ -4,6 +4,8 @@ import axios from "axios";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const backendUrl = import.meta.env.BACKEND_URL;
+  
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const [favourites, setFavourites] = useState([]);
@@ -22,13 +24,13 @@ export const AuthProvider = ({ children }) => {
 
       try {
         // Fetch user info (optional)
-        const userRes = await axios.get("http://localhost:5000/api/account", {
+        const userRes = await axios.get(`${backendUrl}/api/account`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
 
         // Fetch favourites
-        const favRes = await axios.get("http://localhost:5000/api/favourites", {
+        const favRes = await axios.get(`${backendUrl}/api/favourites`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const favIds = favRes.data.map(f => f.recipeId);

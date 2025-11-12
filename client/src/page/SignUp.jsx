@@ -4,6 +4,7 @@ import { UserPlus } from 'lucide-react';
 import axios from 'axios';
 
 const Signup = () => {
+   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
@@ -19,7 +20,7 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here you would typically handle the signup logic, e.g., sending a request to the server
-    axios.post('http://localhost:5000/api/auth/signup', {
+    axios.post(`${backendUrl}/api/auth/signup`, {
       first_name: formData.firstName,
       last_name: formData.lastName,
       email: formData.email,

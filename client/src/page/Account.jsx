@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Account() {
+   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Account() {
     }
 
     // ✅ Fetch user details securely from backend
-    fetch("http://localhost:5000/api/account", {
+    fetch(`${backendUrl}/api/account`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,7 +37,7 @@ export default function Account() {
         navigate("/login");
       })
       .finally(() => setLoading(false));
-  }, [navigate]);
+  }, [navigate, backendUrl]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

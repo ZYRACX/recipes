@@ -1,6 +1,6 @@
 import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/favourites";
+ const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const API_URL = `${backendUrl}/api/favourites`;
 
 export async function getUserFavourites(token) {
   const res = await axios.get(API_URL, {

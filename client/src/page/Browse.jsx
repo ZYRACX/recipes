@@ -7,6 +7,7 @@ import { useFavourites } from "../context/FavouritesContext.jsx";
 import { SlidersHorizontal, Leaf, Globe, X } from "lucide-react";
 
 export const Browse = () => {
+   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { searchTerm } = useSearch();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export const Browse = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/recipes");
+        const res = await fetch(`${backendUrl}/api/recipes`);
         const data = await res.json();
         if (data.success) setRecipes(data.recipes);
       } catch (err) {
@@ -30,7 +31,7 @@ export const Browse = () => {
       }
     };
     fetchRecipes();
-  }, []);
+  }, [backendUrl]);
 
   const availableCountries = useMemo(() => [...new Set(recipes.map(r => r.country))].sort(), [recipes]);
 

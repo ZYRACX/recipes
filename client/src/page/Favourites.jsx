@@ -4,6 +4,7 @@ import MenuItem from "../components/MenuItem.jsx";
 import { useFavourites } from "../context/FavouritesContext.jsx";
 
 const Favourites = () => {
+   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { favourites, toggleFavourite, loading } = useFavourites();
   const [recipes, setRecipes] = useState([]);
 
@@ -11,7 +12,7 @@ const Favourites = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/recipes");
+        const res = await fetch(`${backendUrl}/api/recipes`);
         const data = await res.json();
         if (data.success) setRecipes(data.recipes);
       } catch (err) {
