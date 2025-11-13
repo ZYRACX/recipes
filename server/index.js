@@ -10,9 +10,7 @@ dotenv.config();
 const app = express();
 
 const SECRET = process.env.JWT_SECRET;
-app.use(cors({
-  origin: process.env.EXPRESS_CLIENT_URL,
-}));
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
