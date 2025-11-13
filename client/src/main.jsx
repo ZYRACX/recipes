@@ -7,7 +7,7 @@ import Signup from './page/SignUp.jsx';
 import Account from './page/Account';
 import Header from './components/Header.jsx';
 import { Browse } from './page/Browse.jsx';
-import { Home } from './page/Home.jsx';
+import Home from './page/Home.jsx';
 import { SearchProvider } from './context/SearchContext.jsx';
 import './index.css';
 import { AuthProvider } from "./context/AuthContext.jsx";
